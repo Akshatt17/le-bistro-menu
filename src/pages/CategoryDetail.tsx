@@ -21,7 +21,7 @@ const menuData = {
         description: "Fresh tomatoes, basil, and mozzarella on toasted artisan bread",
         image: bruschettaImage,
         tags: ["Vegetarian", "Classic"],
-        arModel: "/3D models/Grilled-Cheese-Sandwich.glb"
+        arModel: "./3D models/test-model.glb"
       },
       {
         id: 2,
@@ -30,7 +30,7 @@ const menuData = {
         description: "Selection of cured meats, artisan cheeses, and house-made accompaniments",
         image: bruschettaImage,
         tags: ["Signature", "Sharing"],
-        arModel: "/3D models/Sandwich.glb"
+        arModel: "./3D models/test-model.glb"
       },
       {
         id: 9,
@@ -150,8 +150,10 @@ const CategoryDetail = () => {
   const currentCategory = menuData[activeCategory as keyof typeof menuData];
 
   const handleARView = (dishName: string, modelPath: string) => {
+    console.log('AR View clicked for:', dishName, 'Model path:', modelPath);
     setSelectedDish({ name: dishName, modelPath });
     setArViewerOpen(true);
+    console.log('AR Viewer should be opening now');
   };
 
   if (!currentCategory) {

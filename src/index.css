@@ -6,6 +6,77 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* Model Viewer Styles */
+model-viewer {
+  --poster-color: transparent;
+  --progress-bar-color: #f97316;
+  --progress-mask: #f0f0f0;
+  --progress-bar-height: 4px;
+  --progress-bar-color: #f97316;
+  --poster-color: #f0f0f0;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  model-viewer {
+    --progress-bar-height: 6px;
+    touch-action: pan-y;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  .loading-overlay {
+    font-size: 14px;
+  }
+  
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border-width: 3px;
+  }
+}
+
+/* iOS-specific optimizations */
+@supports (-webkit-touch-callout: none) {
+  model-viewer {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    perspective: 1000;
+  }
+  
+  .loading-overlay {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f0f0f0;
+  border-top: 4px solid #f97316;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @layer base {
   :root {
     /* Le Bistro Color Palette */

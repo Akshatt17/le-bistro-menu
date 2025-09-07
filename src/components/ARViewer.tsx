@@ -3,8 +3,7 @@ import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { X, AlertCircle, Smartphone, Monitor } from 'lucide-react';
 import { detectDevice, getARCapabilities } from '../utils/deviceDetection';
-import { Desktop3DViewer } from './Desktop3DViewer';
-import { MobileARViewer } from './MobileARViewer';
+import { SimpleModelViewer } from './SimpleModelViewer';
 
 interface ARViewerProps {
   isOpen: boolean;
@@ -15,6 +14,7 @@ interface ARViewerProps {
 
 // Device-Aware AR Viewer Component
 function DeviceAwareARViewer({ modelPath, dishName }: { modelPath: string; dishName: string }) {
+  console.log('DeviceAwareARViewer rendered with:', { modelPath, dishName });
   const [deviceInfo, setDeviceInfo] = useState(detectDevice());
   const [capabilities, setCapabilities] = useState(getARCapabilities(deviceInfo));
 
@@ -45,26 +45,21 @@ function DeviceAwareARViewer({ modelPath, dishName }: { modelPath: string; dishN
         </div>
       </div>
 
-      {/* Render appropriate viewer */}
-      {deviceInfo.isMobile ? (
-        <MobileARViewer modelPath={modelPath} dishName={dishName} />
-      ) : (
-        <Desktop3DViewer modelPath={modelPath} dishName={dishName} />
-      )}
+             {/* Render model viewer */}
+             <SimpleModelViewer modelPath={modelPath} dishName={dishName} />
     </div>
   );
 }
 
 export function ARViewer({ isOpen, onClose, modelPath, dishName }: ARViewerProps) {
+  console.log('ARViewer rendered with:', { isOpen, modelPath, dishName });
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl w-full h-[80vh] p-0">
         <DialogHeader className="p-6 pb-0">
-          <DialogTitle className="flex items-center justify-between">
-            <span>🍽️ {dishName} - 3D View</span>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
+          <DialogTitle>
+            🍽️ {dishName} - 3D View
           </DialogTitle>
         </DialogHeader>
         
