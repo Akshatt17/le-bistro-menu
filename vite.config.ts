@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: process.env.NODE_ENV === 'production' ? '/le-bistro-menu/' : '/',
+  base: '/le-bistro-menu/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
