@@ -58,6 +58,14 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      fontFamily: {
+        'heading': ['var(--font-heading)'],
+        'body': ['var(--font-body)'],
+      },
+      boxShadow: {
+        'card': 'var(--shadow-card)',
+        'subtle': 'var(--shadow-subtle)',
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
