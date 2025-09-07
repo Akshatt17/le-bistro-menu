@@ -34,12 +34,18 @@ jobs:
         node-version: '18'
         
     - name: Install dependencies
-      run: npm install --legacy-peer-deps
+      run: |
+        rm -rf node_modules package-lock.json
+        npm cache clean --force
+        npm install --legacy-peer-deps
+        npm install rollup@latest --save-dev
       
     - name: Build
-      run: npm run build:prod
+      run: |
+        npm run build:prod
       env:
         NODE_ENV: production
+        CI: false
         
     - name: List build output
       run: ls -la dist/
