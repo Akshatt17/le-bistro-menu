@@ -18,6 +18,8 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
   const [error, setError] = useState<string | null>(null);
   const [arMode, setArMode] = useState<'camera' | 'webxr' | 'fallback'>('camera');
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [modelPlaced, setModelPlaced] = useState(false);
+  const [modelScale, setModelScale] = useState(1);
 
   const deviceInfo = detectDevice();
 
@@ -29,6 +31,38 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
       }
     };
   }, []);
+
+  // Touch event handlers for AR interactions
+  const handleTouchStart = (event: React.TouchEvent) => {
+    if (arMode !== 'camera') return;
+    
+    event.preventDefault();
+    
+    // Single tap to place model
+    if (event.touches.length === 1 && !modelPlaced) {
+      setModelPlaced(true);
+    }
+  };
+
+  const handleTouchMove = (event: React.TouchEvent) => {
+    if (arMode !== 'camera' || !modelPlaced) return;
+    
+    event.preventDefault();
+    
+    // Pinch to scale
+    if (event.touches.length === 2) {
+      const touch1 = event.touches[0];
+      const touch2 = event.touches[1];
+      const distance = Math.sqrt(
+        Math.pow(touch2.clientX - touch1.clientX, 2) + 
+        Math.pow(touch2.clientY - touch1.clientY, 2)
+      );
+      
+      // Scale based on pinch distance (simplified) - adjusted for larger initial size
+      const newScale = Math.max(0.3, Math.min(2.5, distance / 80)); // Adjusted range: 0.3x to 2.5x
+      setModelScale(newScale);
+    }
+  };
 
   const initializeAR = async () => {
     try {
@@ -98,6 +132,7 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
     videoRef.current.setAttribute('playsinline', 'true');
     videoRef.current.setAttribute('webkit-playsinline', 'true');
     videoRef.current.muted = true;
+    videoRef.current.autoplay = true;
     
     // Wait for video to be ready
     videoRef.current.onloadedmetadata = () => {
@@ -124,16 +159,37 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for performance
     rendererRef.current = renderer;
 
+    // Create a video texture for the camera feed
+    const videoTexture = new THREE.VideoTexture(videoRef.current);
+    videoTexture.minFilter = THREE.LinearFilter;
+    videoTexture.magFilter = THREE.LinearFilter;
+
+    // Create a plane to display the video texture
+    const videoGeometry = new THREE.PlaneGeometry(16, 9);
+    const videoMaterial = new THREE.MeshBasicMaterial({ 
+      map: videoTexture,
+      transparent: true,
+      opacity: 1
+    });
+    const videoPlane = new THREE.Mesh(videoGeometry, videoMaterial);
+    videoPlane.position.set(0, 0, -5);
+    scene.add(videoPlane);
+
     // Load GLB model
     const loader = new GLTFLoader();
     loader.load(
       modelPath,
       (gltf) => {
         const model = gltf.scene;
-        // Scale model appropriately for mobile
-        model.scale.setScalar(deviceInfo.isIOS ? 0.3 : 0.5);
+        // Scale model appropriately for mobile - make them more visible
+        const baseScale = deviceInfo.isIOS ? 0.8 : 1.2; // Increased from 0.3/0.5 to 0.8/1.2
+        model.scale.setScalar(baseScale);
         model.position.set(0, 0, -2);
         scene.add(model);
+        
+        // Store model reference for scaling
+        (model as any).userData = { baseScale };
+        
         setIsLoading(false);
       },
       undefined,
@@ -148,6 +204,19 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
     const animate = () => {
       requestAnimationFrame(animate);
       if (renderer && scene && camera) {
+        // Update video texture
+        if (videoTexture) {
+          videoTexture.needsUpdate = true;
+        }
+        
+        // Apply scale changes to model
+        scene.traverse((child) => {
+          if (child.userData && child.userData.baseScale) {
+            const newScale = child.userData.baseScale * modelScale;
+            child.scale.setScalar(newScale);
+          }
+        });
+        
         renderer.render(scene, camera);
       }
     };
@@ -188,21 +257,24 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
 
   return (
     <div className="w-full h-full relative">
-      {/* Camera Feed */}
+      {/* Camera Feed - Hidden but used for texture */}
       {arMode === 'camera' && (
         <video
           ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover opacity-0"
           playsInline
           muted
+          autoPlay
         />
       )}
       
-      {/* 3D Canvas */}
+      {/* 3D Canvas with AR overlay */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
         style={{ zIndex: 1 }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
       />
       
       {/* AR Controls */}
@@ -221,14 +293,18 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
           <>
             <div>• Allow camera access when prompted</div>
             <div>• Point camera at flat surface</div>
-            <div>• Tap to place 3D model</div>
-            <div>• Pinch to scale model</div>
+            <div>• Tap screen to place 3D model</div>
+            <div>• Pinch to scale model (0.3x - 2.5x)</div>
+            <div>• Model placed: {modelPlaced ? '✅' : '❌'}</div>
+            <div>• Scale: {modelScale.toFixed(1)}x</div>
           </>
         ) : (
           <>
             <div>• Point camera at flat surface</div>
-            <div>• Tap to place 3D model</div>
-            <div>• Pinch to scale model</div>
+            <div>• Tap screen to place 3D model</div>
+            <div>• Pinch to scale model (0.3x - 2.5x)</div>
+            <div>• Model placed: {modelPlaced ? '✅' : '❌'}</div>
+            <div>• Scale: {modelScale.toFixed(1)}x</div>
           </>
         )}
       </div>
