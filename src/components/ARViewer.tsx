@@ -40,6 +40,7 @@ function DeviceAwareARViewer({ modelPath, dishName }: { modelPath: string; dishN
         <div className="text-sm text-gray-600 space-y-1">
           <div>• WebXR: {capabilities.canUseWebXR ? '✅ Supported' : '❌ Not Supported'}</div>
           <div>• Camera: {capabilities.canUseCamera ? '✅ Available' : '❌ Not Available'}</div>
+          {deviceInfo.isIOS && <div>• ARKit: {capabilities.canUseARKit ? '✅ Available' : '❌ Not Available'}</div>}
           <div>• 3D Viewer: {capabilities.canUse3DViewer ? '✅ Available' : '❌ Not Available'}</div>
           <div>• Recommended: {capabilities.recommendedMode.toUpperCase()}</div>
         </div>

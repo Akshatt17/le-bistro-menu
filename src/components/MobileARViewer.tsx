@@ -34,7 +34,24 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
     try {
       setIsLoading(true);
       
-      // Try WebXR first if supported
+      // For iOS, prioritize camera AR over WebXR
+      if (deviceInfo.isIOS) {
+        if (deviceInfo.supportsCamera) {
+          const stream = await requestCameraAccess();
+          if (stream) {
+            setCameraStream(stream);
+            setArMode('camera');
+            await initializeCameraAR(stream);
+            return;
+          }
+        }
+        // iOS fallback
+        setArMode('fallback');
+        await initializeFallback();
+        return;
+      }
+      
+      // For Android and other devices, try WebXR first
       if (deviceInfo.supportsWebXR) {
         const xrSession = await requestWebXRSession();
         if (xrSession) {
@@ -66,7 +83,7 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
     }
   };
 
-  const initializeWebXR = async (xrSession: XRSystem) => {
+  const initializeWebXR = async (xrSession: XRSession) => {
     // WebXR implementation would go here
     // For now, fallback to camera AR
     console.log('WebXR session started:', xrSession);
@@ -76,25 +93,35 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
   const initializeCameraAR = async (stream: MediaStream) => {
     if (!videoRef.current || !canvasRef.current) return;
 
-    // Setup video element
+    // Setup video element with iOS-specific attributes
     videoRef.current.srcObject = stream;
-    videoRef.current.play();
+    videoRef.current.setAttribute('playsinline', 'true');
+    videoRef.current.setAttribute('webkit-playsinline', 'true');
+    videoRef.current.muted = true;
+    
+    // Wait for video to be ready
+    videoRef.current.onloadedmetadata = () => {
+      videoRef.current?.play().catch(console.error);
+    };
 
     // Setup Three.js scene
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    // Setup camera
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    // Setup camera with proper aspect ratio
+    const aspect = canvasRef.current.clientWidth / canvasRef.current.clientHeight;
+    const camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
     cameraRef.current = camera;
 
-    // Setup renderer
+    // Setup renderer with iOS-specific settings
     const renderer = new THREE.WebGLRenderer({ 
       canvas: canvasRef.current,
       alpha: true,
-      antialias: true 
+      antialias: true,
+      powerPreference: 'high-performance'
     });
     renderer.setSize(canvasRef.current.clientWidth, canvasRef.current.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for performance
     rendererRef.current = renderer;
 
     // Load GLB model
@@ -103,7 +130,8 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
       modelPath,
       (gltf) => {
         const model = gltf.scene;
-        model.scale.setScalar(0.5);
+        // Scale model appropriately for mobile
+        model.scale.setScalar(deviceInfo.isIOS ? 0.3 : 0.5);
         model.position.set(0, 0, -2);
         scene.add(model);
         setIsLoading(false);
@@ -119,7 +147,9 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
     // Animation loop
     const animate = () => {
       requestAnimationFrame(animate);
-      renderer.render(scene, camera);
+      if (renderer && scene && camera) {
+        renderer.render(scene, camera);
+      }
     };
     animate();
   };
@@ -181,14 +211,26 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
         <div>• Device: {deviceInfo.platform}</div>
         <div>• WebXR: {deviceInfo.supportsWebXR ? '✅' : '❌'}</div>
         <div>• Camera: {deviceInfo.supportsCamera ? '✅' : '❌'}</div>
+        {deviceInfo.isIOS && <div>• ARKit: {deviceInfo.supportsARKit ? '✅' : '❌'}</div>}
       </div>
       
       {/* Instructions */}
       <div className="absolute bottom-4 left-4 right-4 bg-black/70 text-white p-3 rounded-lg text-sm">
         <div className="font-medium mb-1">🎮 Mobile AR Controls:</div>
-        <div>• Point camera at flat surface</div>
-        <div>• Tap to place 3D model</div>
-        <div>• Pinch to scale model</div>
+        {deviceInfo.isIOS ? (
+          <>
+            <div>• Allow camera access when prompted</div>
+            <div>• Point camera at flat surface</div>
+            <div>• Tap to place 3D model</div>
+            <div>• Pinch to scale model</div>
+          </>
+        ) : (
+          <>
+            <div>• Point camera at flat surface</div>
+            <div>• Tap to place 3D model</div>
+            <div>• Pinch to scale model</div>
+          </>
+        )}
       </div>
       
       {/* Fallback Message */}
@@ -197,10 +239,27 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
           <div className="text-center p-4">
             <div className="text-6xl mb-4">📱</div>
             <h3 className="text-xl font-semibold mb-2">{dishName}</h3>
-            <p className="text-gray-600 mb-4">AR not available on this device</p>
-            <p className="text-sm text-gray-500">
-              Camera or WebXR support required for AR
-            </p>
+            {deviceInfo.isIOS ? (
+              <>
+                <p className="text-gray-600 mb-4">Camera access required for AR</p>
+                <p className="text-sm text-gray-500 mb-4">
+                  Please allow camera access when prompted, or try refreshing the page
+                </p>
+                <button 
+                  onClick={initializeAR}
+                  className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                >
+                  Try Again
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-gray-600 mb-4">AR not available on this device</p>
+                <p className="text-sm text-gray-500">
+                  Camera or WebXR support required for AR
+                </p>
+              </>
+            )}
           </div>
         </div>
       )}
