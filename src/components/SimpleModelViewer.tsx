@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { detectDevice } from '../utils/deviceDetection';
+import { getModelPath, getModelInfo } from '../utils/modelPathUtils';
 
 interface SimpleModelViewerProps {
   modelPath: string;
@@ -11,6 +12,10 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const deviceInfo = detectDevice();
+  
+  // Get device-specific model path
+  const deviceSpecificModelPath = getModelPath(modelPath);
+  const modelInfo = getModelInfo(modelPath);
 
   useEffect(() => {
     const modelViewer = modelViewerRef.current;
@@ -24,8 +29,8 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
     const handleError = (event: any) => {
       console.error('Model loading error:', event);
       const errorMessage = deviceInfo.isIOS 
-        ? 'Failed to load 3D model on iOS. Try refreshing the page or using a different browser.'
-        : 'Failed to load 3D model';
+        ? `Failed to load ${modelInfo.format} model on iOS. Try refreshing the page or using a different browser.`
+        : `Failed to load ${modelInfo.format} model`;
       setError(errorMessage);
       setIsLoading(false);
     };
@@ -54,7 +59,8 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
         <div className="text-red-500 text-6xl mb-4">⚠️</div>
         <h3 className="text-xl font-semibold mb-2 text-red-600">Error Loading Model</h3>
         <p className="text-gray-600 mb-4">{error}</p>
-        <p className="text-sm text-gray-500">File: {modelPath.split('/').pop()}</p>
+        <p className="text-sm text-gray-500">File: {deviceSpecificModelPath.split('/').pop()}</p>
+        <p className="text-sm text-gray-500">Format: {modelInfo.format}</p>
       </div>
     );
   }
@@ -64,7 +70,7 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
       <div className="w-full h-full max-w-2xl relative">
         <model-viewer
           ref={modelViewerRef}
-          src={modelPath}
+          src={deviceSpecificModelPath}
           alt={dishName}
           auto-rotate
           camera-controls
@@ -106,6 +112,7 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
               <li>• <strong>Pinch:</strong> Zoom in/out</li>
               <li>• <strong>AR:</strong> Tap AR button for immersive view</li>
               <li>• <strong>Device:</strong> {deviceInfo.platform.toUpperCase()}</li>
+              <li>• <strong>Format:</strong> {modelInfo.format}</li>
             </>
           ) : (
             <>

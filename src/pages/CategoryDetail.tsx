@@ -21,7 +21,7 @@ const menuData = {
         description: "Fresh tomatoes, basil, and mozzarella on toasted artisan bread",
         image: bruschettaImage,
         tags: ["Vegetarian", "Classic"],
-        arModel: "./3D models/grilled_cheese_sandwich.glb"
+        arModel: "./3D models/glb/grilled_cheese_sandwich.glb"
       },
       {
         id: 2,
@@ -30,7 +30,7 @@ const menuData = {
         description: "Selection of cured meats, artisan cheeses, and house-made accompaniments",
         image: bruschettaImage,
         tags: ["Signature", "Sharing"],
-        arModel: "./3D models/Sandwich.glb"
+        arModel: "./3D models/glb/Sandwich.glb"
       },
       {
         id: 9,
@@ -39,7 +39,7 @@ const menuData = {
         description: "Fresh toro and shrimp sushi with traditional accompaniments",
         image: bruschettaImage,
         tags: ["Fresh", "Premium"],
-        arModel: "./3D models/sushi_toro_shrimp.glb"
+        arModel: "./3D models/glb/sushi_toro_shrimp.glb"
       },
     ]
   },
@@ -54,7 +54,7 @@ const menuData = {
         description: "Prime beef tenderloin with seasonal vegetables and red wine reduction",
         image: beefSteakImage,
         tags: ["Signature", "Premium"],
-        arModel: "./3D models/chicken_mexican_dinner.glb"
+        arModel: "./3D models/glb/chicken_mexican_dinner.glb"
       },
       {
         id: 4,
@@ -63,7 +63,7 @@ const menuData = {
         description: "Atlantic salmon with lemon herb butter and roasted vegetables",
         image: beefSteakImage,
         tags: ["Healthy", "Seasonal"],
-        arModel: "./3D models/spicy_ramen.glb"
+        arModel: "./3D models/glb/spicy_ramen.glb"
       },
       {
         id: 10,
@@ -72,7 +72,7 @@ const menuData = {
         description: "Golden crispy chicken nuggets served with dipping sauces",
         image: beefSteakImage,
         tags: ["Crispy", "Comfort"],
-        arModel: "./3D models/chicken_nuggets.glb"
+        arModel: "./3D models/glb/chicken_nuggets.glb"
       },
       {
         id: 13,
@@ -81,7 +81,7 @@ const menuData = {
         description: "Classic grilled cheese with artisan bread and premium cheese",
         image: beefSteakImage,
         tags: ["Classic", "Comfort"],
-        arModel: "./3D models/grilled_cheese_sandwich.glb"
+        arModel: "./3D models/glb/grilled_cheese_sandwich.glb"
       },
     ]
   },
@@ -96,7 +96,7 @@ const menuData = {
         description: "Traditional Italian dessert with mascarpone and espresso-soaked ladyfingers",
         image: tiramisuImage,
         tags: ["Classic", "Coffee"],
-        arModel: "./3D models/tiramisu_cake.glb"
+        arModel: "./3D models/glb/tiramisu_cake.glb"
       },
       {
         id: 6,
@@ -105,7 +105,7 @@ const menuData = {
         description: "Fresh seasonal fruits on vanilla pastry cream with almond crust",
         image: tiramisuImage,
         tags: ["Seasonal", "Fresh"],
-        arModel: "./3D models/strawberry_cake.glb"
+        arModel: "./3D models/glb/strawberry_cake.glb"
       },
       {
         id: 11,
@@ -114,7 +114,7 @@ const menuData = {
         description: "Traditional Vietnamese noodle soup with fresh herbs and spices",
         image: tiramisuImage,
         tags: ["Authentic", "Comfort"],
-        arModel: "./3D models/vietnamese_food.glb"
+        arModel: "./3D models/glb/vietnamese_food.glb"
       },
       {
         id: 12,
@@ -123,7 +123,7 @@ const menuData = {
         description: "Fresh sushi selection from Toronto's finest",
         image: tiramisuImage,
         tags: ["Fresh", "Special"],
-        arModel: "./3D models/toronto_sushi.glb"
+        arModel: "./3D models/glb/toronto_sushi.glb"
       },
     ]
   },

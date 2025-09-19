@@ -141,10 +141,10 @@ src/
 
 ## 📝 Adding 3D Models
 
-1. **Place GLB files** in `src/assets/3D models/`
+1. **Place GLB files** in `public/3D models/glb/`
 2. **Update menu items** in `CategoryDetail.tsx`:
    ```typescript
-   arModel: "/src/assets/3D models/your-model.glb"
+   arModel: "./3D models/glb/your-model.glb"
    ```
 
 ## 🤝 Contributing

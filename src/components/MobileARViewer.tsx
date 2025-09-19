@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { detectDevice, requestCameraAccess, requestWebXRSession } from '../utils/deviceDetection';
+import { getModelPath, getModelInfo } from '../utils/modelPathUtils';
 
 interface MobileARViewerProps {
   modelPath: string;
@@ -22,6 +23,10 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
   const [modelScale, setModelScale] = useState(1);
 
   const deviceInfo = detectDevice();
+  
+  // Get device-specific model path
+  const deviceSpecificModelPath = getModelPath(modelPath);
+  const modelInfo = getModelInfo(modelPath);
 
   useEffect(() => {
     initializeAR();
@@ -175,10 +180,10 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
     videoPlane.position.set(0, 0, -5);
     scene.add(videoPlane);
 
-    // Load GLB model
+    // Load model with device-specific format
     const loader = new GLTFLoader();
     loader.load(
-      modelPath,
+      deviceSpecificModelPath,
       (gltf) => {
         const model = gltf.scene;
         // Scale model appropriately for mobile - make them more visible
@@ -194,8 +199,8 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
       },
       undefined,
       (error) => {
-        console.error('Error loading GLB model:', error);
-        setError('Failed to load 3D model');
+        console.error(`Error loading ${modelInfo.format} model:`, error);
+        setError(`Failed to load ${modelInfo.format} model`);
         setIsLoading(false);
       }
     );
@@ -281,6 +286,7 @@ export function MobileARViewer({ modelPath, dishName }: MobileARViewerProps) {
       <div className="absolute top-4 left-4 bg-black/70 text-white p-3 rounded-lg text-sm">
         <div className="font-medium mb-1">📱 AR Mode: {arMode}</div>
         <div>• Device: {deviceInfo.platform}</div>
+        <div>• Format: {modelInfo.format}</div>
         <div>• WebXR: {deviceInfo.supportsWebXR ? '✅' : '❌'}</div>
         <div>• Camera: {deviceInfo.supportsCamera ? '✅' : '❌'}</div>
         {deviceInfo.isIOS && <div>• ARKit: {deviceInfo.supportsARKit ? '✅' : '❌'}</div>}
