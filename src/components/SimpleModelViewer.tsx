@@ -16,6 +16,21 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
   // Get device-specific model path
   const deviceSpecificModelPath = getModelPath(modelPath);
   const modelInfo = getModelInfo(modelPath);
+  
+  // Debug logging
+  console.log('SimpleModelViewer Debug:', {
+    originalPath: modelPath,
+    deviceSpecificPath: deviceSpecificModelPath,
+    deviceInfo: {
+      platform: deviceInfo.platform,
+      isIOS: deviceInfo.isIOS,
+      isAndroid: deviceInfo.isAndroid
+    },
+    modelInfo: {
+      format: modelInfo.format,
+      selectedPath: modelInfo.selectedPath
+    }
+  });
 
   useEffect(() => {
     const modelViewer = modelViewerRef.current;
@@ -75,7 +90,7 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
           auto-rotate
           camera-controls
           ar
-          ar-modes="webxr scene-viewer"
+          ar-modes={deviceInfo.isIOS ? "quick-look" : "webxr scene-viewer"}
           environment-image="neutral"
           shadow-intensity="1"
           shadow-softness="0.5"
@@ -84,6 +99,7 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
           loading="eager"
           reveal="auto"
           poster=""
+          ios-src={deviceInfo.isIOS ? deviceSpecificModelPath : undefined}
           style={{
             width: '100%',
             height: '100%',
