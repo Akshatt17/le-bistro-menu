@@ -1,7 +1,11 @@
-# MIME types for 3D model files
+# MIME types for 3D model files - Safari requires specific MIME types
 AddType model/gltf-binary .glb
 AddType model/gltf+json .gltf
 AddType model/vnd.usdz+zip .usdz
+
+# Additional Safari-specific MIME types
+AddType application/octet-stream .usdz
+AddType model/gltf-binary .glb
 
 # Enable CORS for 3D model files
 <FilesMatch "\.(glb|gltf|usdz)$">

@@ -5,31 +5,49 @@ import { detectDevice } from './deviceDetection';
 
 /**
  * Get the appropriate model path based on device type
- * - Android: Uses GLB files (better WebXR support)
- * - iOS: Uses USDZ files (better ARKit support)
- * - Desktop: Uses GLB files (better Three.js support)
+ * - For regular 3D viewing: Always use GLB files (works well on all devices)
+ * - For AR mode: Use USDZ on iOS, GLB on Android/Desktop
  */
-export function getModelPath(modelPath: string): string {
+export function getModelPath(modelPath: string, forAR: boolean = false): string {
   const deviceInfo = detectDevice();
   
-  // If the path is already a USDZ path, return it as-is for iOS
+  // If the path is already a USDZ path, return it as-is for iOS AR
   if (modelPath.includes('/usdz/') && modelPath.endsWith('.usdz')) {
-    if (deviceInfo.isIOS) {
+    if (deviceInfo.isIOS && forAR) {
       return modelPath;
     } else {
-      // For non-iOS devices, convert USDZ back to GLB
+      // For non-iOS devices or non-AR mode, convert USDZ back to GLB
       const glbPath = modelPath.replace('/usdz/', '/glb/').replace('.usdz', '.glb');
       return glbPath;
     }
   }
   
-  // If the path is a GLB path, convert to USDZ for iOS
+  // If the path is a GLB path
   if (modelPath.includes('/glb/') && modelPath.endsWith('.glb')) {
-    const usdzPath = modelPath.replace('/glb/', '/usdz/').replace('.glb', '.usdz');
-    
-    if (deviceInfo.isIOS) {
-      return usdzPath;
+    // For AR mode on iOS, try to use USDZ if available
+    if (deviceInfo.isIOS && forAR) {
+      const usdzPath = modelPath.replace('/glb/', '/usdz/').replace('.glb', '.usdz');
+      
+      // Check if USDZ file exists
+      const knownUSDZFiles = [
+        'sushi_toro_shrimp.usdz',
+        'spicy_ramen.usdz', 
+        'grilled_cheese_sandwich.usdz',
+        'Food_Tiramisu_Cake.usdz',
+        'Strawberry_cake.usdz',
+        'vietnamese_food.usdz'
+      ];
+      
+      const fileName = usdzPath.split('/').pop();
+      if (fileName && knownUSDZFiles.includes(fileName)) {
+        console.log(`Using USDZ file for iOS AR: ${usdzPath}`);
+        return usdzPath;
+      } else {
+        console.log(`USDZ file not available for AR, using GLB: ${modelPath}`);
+        return modelPath; // Fall back to GLB for AR
+      }
     } else {
+      // For regular viewing or non-iOS, always use GLB
       return modelPath;
     }
   }
@@ -47,9 +65,9 @@ export function getModelPath(modelPath: string): string {
 /**
  * Get model format information for debugging
  */
-export function getModelInfo(modelPath: string) {
+export function getModelInfo(modelPath: string, forAR: boolean = false) {
   const deviceInfo = detectDevice();
-  const selectedPath = getModelPath(modelPath);
+  const selectedPath = getModelPath(modelPath, forAR);
   
   // Determine original format
   const isOriginalUSDZ = modelPath.includes('/usdz/') && modelPath.endsWith('.usdz');
@@ -63,6 +81,9 @@ export function getModelInfo(modelPath: string) {
     ? modelPath.replace('/glb/', '/usdz/').replace('.glb', '.usdz')
     : modelPath;
   
+  const isUsingUSDZ = selectedPath.endsWith('.usdz');
+  const isARMode = forAR;
+  
   return {
     device: deviceInfo.platform,
     isMobile: deviceInfo.isMobile,
@@ -72,9 +93,15 @@ export function getModelInfo(modelPath: string) {
     glbPath,
     usdzPath,
     selectedPath,
-    format: selectedPath.endsWith('.usdz') ? 'USDZ' : 'GLB',
-    reason: deviceInfo.isIOS 
-      ? 'iOS devices use USDZ for better ARKit support'
-      : 'Android/Desktop devices use GLB for better WebXR/Three.js support'
+    format: isUsingUSDZ ? 'USDZ' : 'GLB',
+    reason: isARMode 
+      ? (deviceInfo.isIOS 
+          ? (isUsingUSDZ 
+              ? 'iOS AR uses USDZ for ARKit Quick Look'
+              : 'iOS AR fallback to GLB (USDZ not available)')
+          : 'Android/Desktop AR uses GLB for WebXR')
+      : 'Regular 3D viewing uses GLB (works well on all devices)',
+    isARMode,
+    isUsingUSDZ
   };
 }

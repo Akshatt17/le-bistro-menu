@@ -12,16 +12,21 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modelViewerReady, setModelViewerReady] = useState(false);
+  const [isARMode, setIsARMode] = useState(false);
   const deviceInfo = detectDevice();
   
-  // Get device-specific model path
-  const deviceSpecificModelPath = getModelPath(modelPath);
-  const modelInfo = getModelInfo(modelPath);
+  // Get device-specific model path - always use GLB for regular viewing
+  const deviceSpecificModelPath = getModelPath(modelPath, false); // false = regular viewing
+  const modelInfo = getModelInfo(modelPath, false);
+  
+  // For Safari on iOS, get the AR-specific path for ios-src
+  const arModelPath = deviceInfo.isIOS ? getModelPath(modelPath, true) : undefined;
   
   // Debug logging
   console.log('SimpleModelViewer Debug:', {
     originalPath: modelPath,
     deviceSpecificPath: deviceSpecificModelPath,
+    arModelPath: arModelPath,
     deviceInfo: {
       platform: deviceInfo.platform,
       isIOS: deviceInfo.isIOS,
@@ -30,6 +35,10 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
     modelInfo: {
       format: modelInfo.format,
       selectedPath: modelInfo.selectedPath
+    },
+    browser: {
+      isSafari: /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent),
+      userAgent: navigator.userAgent
     }
   });
 
@@ -52,8 +61,26 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
             isSafari: /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent),
             supportsQuickLook: 'QuickLook' in window,
             fileExtension: deviceSpecificModelPath.split('.').pop(),
-            isUSDZ: deviceSpecificModelPath.endsWith('.usdz')
+            isUSDZ: deviceSpecificModelPath.endsWith('.usdz'),
+            arModelPath: arModelPath,
+            arModelExtension: arModelPath?.split('.').pop()
           });
+          
+          // Test AR model accessibility for Safari
+          if (arModelPath) {
+            fetch(arModelPath, { method: 'HEAD' })
+              .then(response => {
+                console.log('Safari AR model accessibility:', {
+                  path: arModelPath,
+                  status: response.status,
+                  ok: response.ok,
+                  contentType: response.headers.get('content-type')
+                });
+              })
+              .catch(error => {
+                console.error('Safari AR model accessibility failed:', error);
+              });
+          }
         }
       } catch (error) {
         console.error('File accessibility test failed:', error);
@@ -79,11 +106,46 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
     checkModelViewerReady();
   }, []);
 
+  // Detect AR mode activation
   useEffect(() => {
     if (!modelViewerReady) return;
     
     const modelViewer = modelViewerRef.current;
     if (!modelViewer) return;
+
+    const handleARModeChange = (event: any) => {
+      const isAR = event.detail?.mode === 'quick-look' || event.detail?.mode === 'webxr';
+      console.log('AR mode changed:', { 
+        isAR, 
+        mode: event.detail?.mode,
+        isSafari: /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent),
+        userAgent: navigator.userAgent
+      });
+      setIsARMode(isAR);
+      
+      // If AR is activated on iOS, switch to USDZ if available
+      if (isAR && deviceInfo.isIOS) {
+        const arModelPath = getModelPath(modelPath, true); // true = for AR
+        if (arModelPath !== deviceSpecificModelPath) {
+          console.log('Switching to USDZ for AR mode:', arModelPath);
+          // Update the model source
+          modelViewer.src = arModelPath;
+        }
+      }
+    };
+
+    // Safari-specific AR detection
+    const handleARButtonClick = () => {
+      console.log('AR button clicked on Safari');
+      if (deviceInfo.isIOS) {
+        const arModelPath = getModelPath(modelPath, true);
+        console.log('Safari AR: Using model path:', arModelPath);
+        // For Safari, we might need to update the ios-src attribute
+        if (arModelPath.endsWith('.usdz')) {
+          modelViewer.setAttribute('ios-src', arModelPath);
+        }
+      }
+    };
 
     const handleLoad = () => {
       console.log('Model loaded successfully');
@@ -122,14 +184,32 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
     modelViewer.addEventListener('load', handleLoad);
     modelViewer.addEventListener('error', handleError);
     modelViewer.addEventListener('progress', handleProgress);
+    modelViewer.addEventListener('ar-status', handleARModeChange);
+    
+    // Safari-specific event listeners
+    modelViewer.addEventListener('ar-tracking', handleARModeChange);
+    modelViewer.addEventListener('ar-ready', handleARModeChange);
+    
+    // Listen for AR button clicks (Safari specific)
+    const arButton = modelViewer.shadowRoot?.querySelector('[data-ar-button]');
+    if (arButton) {
+      arButton.addEventListener('click', handleARButtonClick);
+    }
 
     // Cleanup
     return () => {
       modelViewer.removeEventListener('load', handleLoad);
       modelViewer.removeEventListener('error', handleError);
       modelViewer.removeEventListener('progress', handleProgress);
+      modelViewer.removeEventListener('ar-status', handleARModeChange);
+      modelViewer.removeEventListener('ar-tracking', handleARModeChange);
+      modelViewer.removeEventListener('ar-ready', handleARModeChange);
+      
+      if (arButton) {
+        arButton.removeEventListener('click', handleARButtonClick);
+      }
     };
-  }, [modelPath, modelViewerReady]);
+  }, [modelPath, modelViewerReady, deviceInfo.isIOS]);
 
   if (error) {
     return (
@@ -162,7 +242,7 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
           loading="eager"
           reveal="auto"
           poster=""
-          ios-src={deviceInfo.isIOS ? deviceSpecificModelPath : undefined}
+          ios-src={arModelPath}
           style={{
             width: '100%',
             height: '100%',
@@ -191,7 +271,7 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
               <li>• <strong>Pinch:</strong> Zoom in/out</li>
               <li>• <strong>AR:</strong> Tap AR button for immersive view</li>
               <li>• <strong>Device:</strong> {deviceInfo.platform.toUpperCase()}</li>
-              <li>• <strong>Format:</strong> {modelInfo.format}</li>
+              <li>• <strong>Format:</strong> {modelInfo.format} ({modelInfo.reason})</li>
             </>
           ) : (
             <>
