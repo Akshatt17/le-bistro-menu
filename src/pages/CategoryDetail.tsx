@@ -21,7 +21,7 @@ const menuData = {
         description: "Fresh tomatoes, basil, and mozzarella on toasted artisan bread",
         image: bruschettaImage,
         tags: ["Vegetarian", "Classic"],
-        arModel: "./3D models/usdz/sushi_toro_shrimp.usdz"
+        arModel: "./3D models/glb/grilled_cheese_sandwich.glb"
       },
       {
         id: 2,
@@ -30,7 +30,7 @@ const menuData = {
         description: "Selection of cured meats, artisan cheeses, and house-made accompaniments",
         image: bruschettaImage,
         tags: ["Signature", "Sharing"],
-        arModel: "./3D models/usdz/spicy_ramen.usdz"
+        arModel: "./3D models/glb/spicy_ramen.glb"
       },
       {
         id: 9,
@@ -39,7 +39,7 @@ const menuData = {
         description: "Fresh toro and shrimp sushi with traditional accompaniments",
         image: bruschettaImage,
         tags: ["Fresh", "Premium"],
-        arModel: "./3D models/usdz/grilled_cheese_sandwich.usdz"
+        arModel: "./3D models/glb/grilled_cheese_sandwich.glb"
       },
       {
         id: 14,
@@ -48,7 +48,7 @@ const menuData = {
         description: "Testing USDZ format for iOS AR - Sushi with toro and shrimp",
         image: bruschettaImage,
         tags: ["AR Test", "iOS"],
-        arModel: "./3D models/usdz/sushi_toro_shrimp.usdz"
+        arModel: "./3D models/glb/sushi_toro_shrimp.glb"
       },
     ]
   },
@@ -63,7 +63,7 @@ const menuData = {
         description: "Prime beef tenderloin with seasonal vegetables and red wine reduction",
         image: beefSteakImage,
         tags: ["Signature", "Premium"],
-        arModel: "./3D models/usdz/Food_Tiramisu_Cake.usdz"
+        arModel: "./3D models/glb/Food_Tiramisu_Cake.glb"
       },
       {
         id: 4,
@@ -72,7 +72,7 @@ const menuData = {
         description: "Atlantic salmon with lemon herb butter and roasted vegetables",
         image: beefSteakImage,
         tags: ["Healthy", "Seasonal"],
-        arModel: "./3D models/usdz/Strawberry_cake.usdz"
+        arModel: "./3D models/glb/Strawberry_cake.glb"
       },
       {
         id: 16,
@@ -81,7 +81,7 @@ const menuData = {
         description: "Testing USDZ format for iOS AR - Spicy ramen bowl",
         image: beefSteakImage,
         tags: ["AR Test", "iOS"],
-        arModel: "./3D models/usdz/spicy_ramen.usdz"
+        arModel: "./3D models/glb/spicy_ramen.glb"
       },
       {
         id: 10,
@@ -90,7 +90,7 @@ const menuData = {
         description: "Golden crispy chicken nuggets served with dipping sauces",
         image: beefSteakImage,
         tags: ["Crispy", "Comfort"],
-        arModel: "./3D models/usdz/vietnamese_food.usdz"
+        arModel: "./3D models/glb/vietnamese_food.glb"
       },
       {
         id: 13,
@@ -99,7 +99,7 @@ const menuData = {
         description: "Classic grilled cheese with artisan bread and premium cheese",
         image: beefSteakImage,
         tags: ["Classic", "Comfort"],
-        arModel: "./3D models/usdz/sushi_toro_shrimp.usdz"
+        arModel: "./3D models/glb/sushi_toro_shrimp.glb"
       },
       {
         id: 15,
@@ -108,7 +108,7 @@ const menuData = {
         description: "Testing USDZ format for iOS AR - Grilled cheese sandwich",
         image: beefSteakImage,
         tags: ["AR Test", "iOS"],
-        arModel: "./3D models/usdz/grilled_cheese_sandwich.usdz"
+        arModel: "./3D models/glb/grilled_cheese_sandwich.glb"
       },
     ]
   },
@@ -123,7 +123,7 @@ const menuData = {
         description: "Traditional Italian dessert with mascarpone and espresso-soaked ladyfingers",
         image: tiramisuImage,
         tags: ["Classic", "Coffee"],
-        arModel: "./3D models/usdz/spicy_ramen.usdz"
+        arModel: "./3D models/glb/spicy_ramen.glb"
       },
       {
         id: 17,
@@ -132,7 +132,7 @@ const menuData = {
         description: "Testing USDZ format for iOS AR - Classic tiramisu cake",
         image: tiramisuImage,
         tags: ["AR Test", "iOS"],
-        arModel: "./3D models/usdz/Food_Tiramisu_Cake.usdz"
+        arModel: "./3D models/glb/Food_Tiramisu_Cake.glb"
       },
       {
         id: 6,
@@ -141,7 +141,7 @@ const menuData = {
         description: "Fresh seasonal fruits on vanilla pastry cream with almond crust",
         image: tiramisuImage,
         tags: ["Seasonal", "Fresh"],
-        arModel: "./3D models/usdz/grilled_cheese_sandwich.usdz"
+        arModel: "./3D models/glb/grilled_cheese_sandwich.glb"
       },
       {
         id: 18,
@@ -150,7 +150,7 @@ const menuData = {
         description: "Testing USDZ format for iOS AR - Strawberry cake",
         image: tiramisuImage,
         tags: ["AR Test", "iOS"],
-        arModel: "./3D models/usdz/Strawberry_cake.usdz"
+        arModel: "./3D models/glb/Strawberry_cake.glb"
       },
       {
         id: 11,
@@ -159,7 +159,7 @@ const menuData = {
         description: "Traditional Vietnamese noodle soup with fresh herbs and spices",
         image: tiramisuImage,
         tags: ["Authentic", "Comfort"],
-        arModel: "./3D models/usdz/Food_Tiramisu_Cake.usdz"
+        arModel: "./3D models/glb/Food_Tiramisu_Cake.glb"
       },
       {
         id: 19,
@@ -168,7 +168,7 @@ const menuData = {
         description: "Testing USDZ format for iOS AR - Vietnamese food",
         image: tiramisuImage,
         tags: ["AR Test", "iOS"],
-        arModel: "./3D models/usdz/vietnamese_food.usdz"
+        arModel: "./3D models/glb/vietnamese_food.glb"
       },
       {
         id: 12,
@@ -177,7 +177,7 @@ const menuData = {
         description: "Fresh sushi selection from Toronto's finest",
         image: tiramisuImage,
         tags: ["Fresh", "Special"],
-        arModel: "./3D models/usdz/Strawberry_cake.usdz"
+        arModel: "./3D models/glb/Strawberry_cake.glb"
       },
     ]
   },
