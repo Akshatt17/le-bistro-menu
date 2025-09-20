@@ -41,6 +41,15 @@ const menuData = {
         tags: ["Fresh", "Premium"],
         arModel: "./3D models/glb/sushi_toro_shrimp.glb"
       },
+      {
+        id: 14,
+        name: "USDZ Sushi Test",
+        price: "$24",
+        description: "Testing USDZ format for iOS AR - Sushi with toro and shrimp",
+        image: bruschettaImage,
+        tags: ["AR Test", "iOS"],
+        arModel: "./3D models/usdz/sushi_toro_shrimp.glb.usdz"
+      },
     ]
   },
   "main-courses": {
@@ -66,6 +75,15 @@ const menuData = {
         arModel: "./3D models/glb/spicy_ramen.glb"
       },
       {
+        id: 16,
+        name: "USDZ Spicy Ramen Test",
+        price: "$28",
+        description: "Testing USDZ format for iOS AR - Spicy ramen bowl",
+        image: beefSteakImage,
+        tags: ["AR Test", "iOS"],
+        arModel: "./3D models/usdz/spicy_ramen.glb.usdz"
+      },
+      {
         id: 10,
         name: "Crispy Chicken Nuggets",
         price: "$16",
@@ -83,6 +101,15 @@ const menuData = {
         tags: ["Classic", "Comfort"],
         arModel: "./3D models/glb/grilled_cheese_sandwich.glb"
       },
+      {
+        id: 15,
+        name: "USDZ Grilled Cheese Test",
+        price: "$14",
+        description: "Testing USDZ format for iOS AR - Grilled cheese sandwich",
+        image: beefSteakImage,
+        tags: ["AR Test", "iOS"],
+        arModel: "./3D models/usdz/grilled_cheese_sandwich.usdz"
+      },
     ]
   },
   desserts: {
@@ -99,6 +126,15 @@ const menuData = {
         arModel: "./3D models/glb/tiramisu_cake.glb"
       },
       {
+        id: 17,
+        name: "USDZ Tiramisu Test",
+        price: "$9",
+        description: "Testing USDZ format for iOS AR - Classic tiramisu cake",
+        image: tiramisuImage,
+        tags: ["AR Test", "iOS"],
+        arModel: "./3D models/usdz/Food - Tiramisu Cake.glb.usdz"
+      },
+      {
         id: 6,
         name: "Seasonal Fruit Tart",
         price: "$8",
@@ -108,6 +144,15 @@ const menuData = {
         arModel: "./3D models/glb/strawberry_cake.glb"
       },
       {
+        id: 18,
+        name: "USDZ Strawberry Cake Test",
+        price: "$8",
+        description: "Testing USDZ format for iOS AR - Strawberry cake",
+        image: tiramisuImage,
+        tags: ["AR Test", "iOS"],
+        arModel: "./3D models/usdz/Strawberry cake.usdz"
+      },
+      {
         id: 11,
         name: "Authentic Vietnamese Pho",
         price: "$14",
@@ -115,6 +160,15 @@ const menuData = {
         image: tiramisuImage,
         tags: ["Authentic", "Comfort"],
         arModel: "./3D models/glb/vietnamese_food.glb"
+      },
+      {
+        id: 19,
+        name: "USDZ Vietnamese Food Test",
+        price: "$14",
+        description: "Testing USDZ format for iOS AR - Vietnamese food",
+        image: tiramisuImage,
+        tags: ["AR Test", "iOS"],
+        arModel: "./3D models/usdz/vietnamese_food.usdz"
       },
       {
         id: 12,
