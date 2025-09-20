@@ -11,6 +11,7 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
   const modelViewerRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [modelViewerReady, setModelViewerReady] = useState(false);
   const deviceInfo = detectDevice();
   
   // Get device-specific model path
@@ -32,7 +33,55 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
     }
   });
 
+  // Test file accessibility
   useEffect(() => {
+    const testFileAccess = async () => {
+      try {
+        const response = await fetch(deviceSpecificModelPath, { method: 'HEAD' });
+        console.log('File accessibility test:', {
+          path: deviceSpecificModelPath,
+          status: response.status,
+          ok: response.ok,
+          headers: Object.fromEntries(response.headers.entries())
+        });
+        
+        // Additional iOS-specific checks
+        if (deviceInfo.isIOS) {
+          console.log('iOS-specific checks:', {
+            userAgent: navigator.userAgent,
+            isSafari: /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent),
+            supportsQuickLook: 'QuickLook' in window,
+            fileExtension: deviceSpecificModelPath.split('.').pop(),
+            isUSDZ: deviceSpecificModelPath.endsWith('.usdz')
+          });
+        }
+      } catch (error) {
+        console.error('File accessibility test failed:', error);
+      }
+    };
+    
+    testFileAccess();
+  }, [deviceSpecificModelPath, deviceInfo.isIOS]);
+
+  // Check if model-viewer is ready
+  useEffect(() => {
+    const checkModelViewerReady = () => {
+      const modelViewer = modelViewerRef.current;
+      if (modelViewer && typeof modelViewer.addEventListener === 'function') {
+        setModelViewerReady(true);
+        console.log('Model viewer is ready');
+      } else {
+        console.log('Model viewer not ready, retrying in 100ms...');
+        setTimeout(checkModelViewerReady, 100);
+      }
+    };
+    
+    checkModelViewerReady();
+  }, []);
+
+  useEffect(() => {
+    if (!modelViewerReady) return;
+    
     const modelViewer = modelViewerRef.current;
     if (!modelViewer) return;
 
@@ -43,9 +92,23 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
 
     const handleError = (event: any) => {
       console.error('Model loading error:', event);
+      console.error('Error details:', {
+        deviceInfo,
+        modelPath: deviceSpecificModelPath,
+        modelInfo,
+        eventDetail: event.detail
+      });
+      
+      // For iOS USDZ errors, try to provide more helpful information
+      if (deviceInfo.isIOS && deviceSpecificModelPath.endsWith('.usdz')) {
+        console.log('iOS USDZ loading failed, checking for common issues...');
+        console.log('Model-viewer version:', document.querySelector('model-viewer')?.getAttribute('src'));
+        console.log('iOS-src attribute:', document.querySelector('model-viewer')?.getAttribute('ios-src'));
+      }
+      
       const errorMessage = deviceInfo.isIOS 
-        ? `Failed to load ${modelInfo.format} model on iOS. Try refreshing the page or using a different browser.`
-        : `Failed to load ${modelInfo.format} model`;
+        ? `Failed to load ${modelInfo.format} model on iOS. Path: ${deviceSpecificModelPath}. This might be due to iOS Safari compatibility or model format issues. Try refreshing the page or using a different browser.`
+        : `Failed to load ${modelInfo.format} model. Path: ${deviceSpecificModelPath}`;
       setError(errorMessage);
       setIsLoading(false);
     };
@@ -66,7 +129,7 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
       modelViewer.removeEventListener('error', handleError);
       modelViewer.removeEventListener('progress', handleProgress);
     };
-  }, [modelPath]);
+  }, [modelPath, modelViewerReady]);
 
   if (error) {
     return (

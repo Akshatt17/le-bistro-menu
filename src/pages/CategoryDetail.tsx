@@ -132,7 +132,7 @@ const menuData = {
         description: "Testing USDZ format for iOS AR - Classic tiramisu cake",
         image: tiramisuImage,
         tags: ["AR Test", "iOS"],
-        arModel: "./3D models/usdz/Food - Tiramisu Cake.usdz"
+        arModel: "./3D models/usdz/Food_Tiramisu_Cake.usdz"
       },
       {
         id: 6,
@@ -150,7 +150,7 @@ const menuData = {
         description: "Testing USDZ format for iOS AR - Strawberry cake",
         image: tiramisuImage,
         tags: ["AR Test", "iOS"],
-        arModel: "./3D models/usdz/Strawberry cake.usdz"
+        arModel: "./3D models/usdz/Strawberry_cake.usdz"
       },
       {
         id: 11,
