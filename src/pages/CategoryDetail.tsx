@@ -48,7 +48,7 @@ const menuData = {
         description: "Testing USDZ format for iOS AR - Sushi with toro and shrimp",
         image: bruschettaImage,
         tags: ["AR Test", "iOS"],
-        arModel: "./3D models/usdz/sushi_toro_shrimp.glb.usdz"
+        arModel: "./3D models/usdz/sushi_toro_shrimp.usdz"
       },
     ]
   },
@@ -81,7 +81,7 @@ const menuData = {
         description: "Testing USDZ format for iOS AR - Spicy ramen bowl",
         image: beefSteakImage,
         tags: ["AR Test", "iOS"],
-        arModel: "./3D models/usdz/spicy_ramen.glb.usdz"
+        arModel: "./3D models/usdz/spicy_ramen.usdz"
       },
       {
         id: 10,
@@ -132,7 +132,7 @@ const menuData = {
         description: "Testing USDZ format for iOS AR - Classic tiramisu cake",
         image: tiramisuImage,
         tags: ["AR Test", "iOS"],
-        arModel: "./3D models/usdz/Food - Tiramisu Cake.glb.usdz"
+        arModel: "./3D models/usdz/Food - Tiramisu Cake.usdz"
       },
       {
         id: 6,

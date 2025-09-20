@@ -34,6 +34,12 @@ export function getModelPath(modelPath: string): string {
     }
   }
   
+  // Safety check: prevent double extensions
+  if (modelPath.includes('.usdz.usdz') || modelPath.includes('.glb.glb')) {
+    console.warn('Double extension detected in model path:', modelPath);
+    return modelPath.replace(/\.(usdz|glb)\.(usdz|glb)$/, '.$2');
+  }
+  
   // Fallback: return original path
   return modelPath;
 }
