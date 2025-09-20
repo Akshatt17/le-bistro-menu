@@ -34,7 +34,8 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
     },
     modelInfo: {
       format: modelInfo.format,
-      selectedPath: modelInfo.selectedPath
+      selectedPath: modelInfo.selectedPath,
+      reason: modelInfo.reason
     },
     browser: {
       isSafari: /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent),
