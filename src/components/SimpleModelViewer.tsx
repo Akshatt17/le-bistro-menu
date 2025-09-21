@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { detectDevice } from '../utils/deviceDetection';
 import { getModelPath, getModelInfo } from '../utils/modelPathUtils';
+import FakeARViewer from './FakeARViewer';
 
 interface SimpleModelViewerProps {
   modelPath: string;
@@ -13,6 +14,7 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
   const [error, setError] = useState<string | null>(null);
   const [modelViewerReady, setModelViewerReady] = useState(false);
   const [isARMode, setIsARMode] = useState(false);
+  const [showFakeAR, setShowFakeAR] = useState(false);
   const deviceInfo = detectDevice();
   
   // Get device-specific model path - always use GLB for regular viewing
@@ -224,6 +226,16 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
     );
   }
 
+  // Show Fake AR overlay if enabled
+  if (showFakeAR) {
+    return (
+      <FakeARViewer
+        modelPath={deviceSpecificModelPath}
+        onClose={() => setShowFakeAR(false)}
+      />
+    );
+  }
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div className="w-full h-full max-w-2xl relative">
@@ -258,6 +270,19 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
             <p>Loading 3D Model...</p>
           </div>
         )}
+
+        {/* Fake AR Button */}
+        <div className="absolute top-4 right-4 z-10">
+          <button
+            id="fake-ar-btn"
+            onClick={() => setShowFakeAR(true)}
+            className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-colors"
+            title="Open Fake AR Mode"
+          >
+            <span className="text-lg">📷</span>
+            <span className="text-sm font-medium">Fake AR</span>
+          </button>
+        </div>
       </div>
       
       {/* Device-Specific Instructions */}
@@ -271,6 +296,7 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
               <li>• <strong>Touch:</strong> Drag to rotate model</li>
               <li>• <strong>Pinch:</strong> Zoom in/out</li>
               <li>• <strong>AR:</strong> Tap AR button for immersive view</li>
+              <li>• <strong>Fake AR:</strong> Tap purple button for camera overlay</li>
               <li>• <strong>Device:</strong> {deviceInfo.platform.toUpperCase()}</li>
               <li>• <strong>Format:</strong> {modelInfo.format} ({modelInfo.reason})</li>
             </>
@@ -280,6 +306,7 @@ export function SimpleModelViewer({ modelPath, dishName }: SimpleModelViewerProp
               <li>• <strong>Scroll:</strong> Zoom in/out</li>
               <li>• <strong>Right-click:</strong> Pan around</li>
               <li>• <strong>AR:</strong> Click AR button (if supported)</li>
+              <li>• <strong>Fake AR:</strong> Click purple button for camera overlay</li>
             </>
           )}
         </ul>
