@@ -12,6 +12,7 @@ const FakeARViewer: React.FC<FakeARViewerProps> = ({ modelPath, onClose }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
+  const [loadingTimeout, setLoadingTimeout] = useState<NodeJS.Timeout | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [modelPosition, setModelPosition] = useState({ x: 0, y: 0 });
@@ -51,6 +52,18 @@ const FakeARViewer: React.FC<FakeARViewerProps> = ({ modelPath, onClose }) => {
     };
   }, []);
 
+  // Fallback: Set model as loaded after a short delay regardless of model-viewer state
+  useEffect(() => {
+    const fallbackTimeout = setTimeout(() => {
+      if (!isModelLoaded) {
+        console.log('Fallback: Setting model as loaded');
+        setIsModelLoaded(true);
+      }
+    }, 1500);
+
+    return () => clearTimeout(fallbackTimeout);
+  }, [isModelLoaded]);
+
   // Handle model viewer load
   const handleModelLoad = () => {
     setIsModelLoaded(true);
@@ -62,6 +75,57 @@ const FakeARViewer: React.FC<FakeARViewerProps> = ({ modelPath, onClose }) => {
     console.error('Fake AR model error:', error);
     setCameraError('Failed to load 3D model. Please try again.');
   };
+
+  // Initialize model-viewer when component mounts
+  useEffect(() => {
+    const initializeModelViewer = () => {
+      if (modelViewerRef.current) {
+        const modelViewer = modelViewerRef.current;
+        
+        // Add event listeners
+        modelViewer.addEventListener('load', handleModelLoad);
+        modelViewer.addEventListener('error', handleModelError);
+        
+        // Set a shorter timeout to handle cases where load event doesn't fire
+        const loadTimeout = setTimeout(() => {
+          console.log('Model load timeout - assuming loaded');
+          setIsModelLoaded(true);
+        }, 2000);
+        
+        // Also check if model is already loaded after a short delay
+        const quickCheckTimeout = setTimeout(() => {
+          if (modelViewer && modelViewer.model && !isModelLoaded) {
+            console.log('Model already loaded - setting state');
+            setIsModelLoaded(true);
+          }
+        }, 500);
+        
+        setLoadingTimeout(loadTimeout);
+      }
+    };
+
+    // Reset loading state when model path changes
+    setIsModelLoaded(false);
+    
+    // Small delay to ensure model-viewer is ready
+    const initTimeout = setTimeout(initializeModelViewer, 200);
+    
+    return () => {
+      clearTimeout(initTimeout);
+      if (loadingTimeout) {
+        clearTimeout(loadingTimeout);
+      }
+    };
+  }, [modelPath]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (loadingTimeout) {
+        clearTimeout(loadingTimeout);
+      }
+    };
+  }, [loadingTimeout]);
 
   // Mouse/touch drag handlers
   const handlePointerDown = (e: React.PointerEvent) => {
